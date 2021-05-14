@@ -2,7 +2,7 @@
 --  Join
 --------------------
 
---  employees�� departments ���̺� Ȯ��
+--  employees와 departments 테이블 확인
 DESC employees;
 DESC departments;
 
@@ -11,17 +11,17 @@ select * from departments;     --   27
 
 select first_name, department_name
 from employees, departments;
--- �� ���̺��� ���� ������ ��� ���� ��µ�
---  īƼ�� ���δ�Ʈ, Cross Join
---  �Ϲ������� �̷� ����� �������� ���� ��
+-- 두 테이블의 조합 가능한 모든 행이 출력됨
+--  카티젼 프로덕트, Cross Join
+--  일반적으로 이런 결과를 원하지는 않을 것
 
---  �� ���̺��� ���� ������ Where�� �ο� -> simple Join
+--  두 테이블의 연결 조건을 Where에 부여 -> simple Join
 
 select *
 from employees, departments
 where employees.department_id = departments.department_id; --   106
 
---  �ʵ��� ��ȣ���� �ؼ��ϱ� ���� ���̺��� Ȥ�� alias�� �ο��Ѵ�
+--  필드의 모호성을 해소하기 위해 테이블명 혹은 alias를 부여한다
 select first_name,
     emp.department_id,
     dept.department_id,
@@ -39,17 +39,17 @@ select first_name,
     department_name
 from employees emp JOIN departments dept
                         on emp.department_id = dept.department_id;
-                        --  ON�� JOIN�� ������ ������ �� ���
-                        --  WHERE�� SELECT�� ������ ������ �� ���
+                        --  ON은 JOIN의 조건을 명시할 때 사용
+                        --  WHERE는 SELECT의 조건을 명시할 떄 사용
                         
 select first_name, department_name
 from employees NATURAL JOIN departments;    -- NATURAL JOIN
---  ���� �̸��� ���� �÷��� �������� JOIN
+--  같은 이름을 가진 컬럼을 기준으로 JOIN
 
 --  Theta JOIN
---  Ư�� ������ �������� JOIN�� �Ѵ�
---  ������ = �� �ƴ� ���
---  Non-Equi JOIN �̶���� �Ѵ�
+--  특정 조건을 기준으로 JOIN을 한다
+--  조건이 = 이 아닌 경우
+--  Non-Equi JOIN 이라고도 한다
 select * from jobs where job_id = 'FI_MGR';
 
 select first_name, salary from employees emp, jobs j
@@ -58,9 +58,9 @@ where j.job_id = 'FI_MGR' AND salary BETWEEN j.min_salary AND j.max_salary;
 -------------------
 --  Outer JOIN
 -------------------
---  ������ �����ϴ� ¦�� ���� ���ڵ嵵 null�� �����Ͽ� ����� ���
---  ��� ���ڵ带 ����� ���̺��� ��� ��ġ�� �ִ°��� ���� LEFT, RIGHT, FULL
---  ORACLE SQL�� ��� NULL�� ��µ� �� �ִ� �� ���ǿ� (+)�� ���δ�
+--  조건이 만족하는 짝이 없는 레코드도 null을 포함하여 결과를 출력
+--  모든 레코드를 출력할 테이블이 어느 위치에 있는가에 따라서 LEFT, RIGHT, FULL
+--  ORACLE SQL의 경우 NULL이 출력될 수 있는 쪽 조건에 (+)를 붙인다
 
 --INNER JOIN
 select first_name,
@@ -70,15 +70,15 @@ select first_name,
 from employees emp, departments dept
 where emp.department_id = dept.department_id;   --  106
 
---  ��ü ��� ��
-select count(*) from employees; --  107 �� ���� �������
+--  전체 사원 수
+select count(*) from employees; --  107 한 명은 어디갔을까
 
---  �μ� id�� null�� ����
+--  부서 id가 null인 직원
 select first_name, department_id
 from employees
 where department_id is NULL;
 
---  LEFT OUTER JOIN : ¦�� ��� ������ ���̺� ��ü�� ��¿� ���� ��Ŵ
+--  LEFT OUTER JOIN : 짝이 없어도 왼쪽의 테이블 전체를 출력에 참여 시킴
 --  ORACLE SQL
 select first_name,
     emp.department_id,
@@ -96,8 +96,8 @@ from employees emp LEFT OUTER JOIN departments dept
                         ON emp.department_id = dept.department_id;
                         
 --  RIGHT OUTER JOIN
---  ������ ���̺��� ��� ���ڵ带 ��¿� ���� -> ���� ���̺��� ��Ī�Ǵ� ¦�� ���� ���
---  ���� ���̺� �÷��� NULL ǥ��ȴ�
+--  오른쪽 테이블의 모든 레코드를 출력에 참여 -> 왼쪽 테이블에 매칭되는 짝이 없는 경우
+--  왼쪽 테이블 컬럼이 NULL 표기된다
 select first_name,
     emp.department_id,
     dept.department_id,
@@ -114,7 +114,7 @@ from employees emp RIGHT OUTER JOIN departments dept
                     ON emp.department_id = dept.department_id; --   122
 
 --  FULL OUTER JOIN
---  ���� ���̺� ��� ¦�� ��� ��¿� ����
+--  양쪽 테이블 모두 짝이 없어도 출력에 참여
 
 --  ERROR
 --select first_name,
@@ -123,7 +123,7 @@ from employees emp RIGHT OUTER JOIN departments dept
 --    department_name
 --from employees emp, department dept
 --where emp.department_id (+) = dept.department_id (+);
---  ORACLE SQL������ LEFT / RIGHT OUTER JOIN�� ���� �����ϴ�
+--  ORACLE SQL에서는 LEFT / RIGHT OUTER JOIN만 실행 가능하다
 
 --  ANSI SQL
 Select first_name,
@@ -133,8 +133,8 @@ Select first_name,
 from employees emp FULL OUTER JOIN departments dept
                         ON emp.department_id = dept.department_id;
                         
---  JOIN ����
---  �μ� ID, �μ���, ���� ���ø�, �������� ���!_!
+--  JOIN 연습
+--  부서 ID, 부서명, 속한 도시명, 국가명을 출력!_!
 select department_id,
     department_name,
     city,
@@ -158,11 +158,11 @@ order by department_id asc;
 -----------
 --  SELF JOIN
 ------------
---  �ڱ� �ڽŰ� JOIN
---  �Ѱ� ���̺��� �� �� �̻� ����ؾ��ϹǷ� �ݵ�� Alias ���
+--  자기 자신과 JOIN
+--  한개 데이블을 두 번 이상 사용해야하므로 반드시 Alias 사용
 select *  from employees;   --  107
 
---  ����� ���̵�, ��� �̸�, �Ŵ��� ���̵�, �Ŵ��� �̸�
+--  사원의 아이디, 사원 이름, 매니저 아이디, 매니저 이름
 select emp.employee_id,
     emp.first_name,
     emp.manager_id,
@@ -182,10 +182,319 @@ where emp.manager_id = man.employee_id; --  106
 select * from employees
 where manager_id is null;
 
---  �Ŵ����� ���� ����� ���
+--  매니저가 없는 사람도 출력
 select emp.employee_id,
     emp.first_name,
     emp.manager_id,
     man.first_name
 from employees emp, employees man
 where emp.manager_id = man.employee_id (+); --  107
+
+-------------------
+--  aggregation
+-------------------
+--  여러 행을 입력으로 데이터를 집계해서 하나의 행으로 변환
+
+--  count : 갯수 세기
+--  employees 테이블에 몇 개의 레코드가 있나?
+select count(*) from employees; -- 107
+
+--  * 로 카운트 -> 모든 레코드 수
+--  컬럼 명시 -> null 값은 제외
+select count(commission_pct) from employees;        -- 35
+
+--  아래 쿼리와 동일
+select count(*) from employees
+where commission_pct is not null;
+
+--  SUM 합계
+--  사원들 급여 총합
+select sum(salary) from employees;  --  691416
+
+--  AVG 평균
+--  사원들 급여 평균
+select avg(salary) from employees;
+
+--  집계 합수는 null 값을 제외한다
+--  사원들이 가지는 커미션 비율의 평균치를 구하라
+select avg(commission_pct) from employees;  --  22%
+
+--  null을 0으로 치환
+select avg(nvl(commission_pct, 0)) from employees;  --  7%
+--  집계함수 수행시 null(결측치) 값을 처리할 방식을 정책으로 결정하고 수행
+
+--  사원들이 받는 급여의 최솟값, 최댓값, 평균, 중앙값
+select MIN(salary), MAX(salary), avg(salary), median(salary)
+from employees;
+
+--  흔히 범하는 오류
+--  부서별 평균 급여
+select department_id, AVG(salary)
+from employees; --  department_id는 단일 레코드로 집계 불가 
+
+select department_id, salary
+from employees
+order by department_id;
+
+--  수정
+--  그룹별 집계를 위해서는 Group by 절을 이용
+select department_id, ROUND(avg(salary), 2) "AVERAGE SALARY"
+from employees
+group by department_id
+order by department_id;
+
+--  집계 함수를 사용한 쿼리문의 SELECT COLUMN 목록에는
+--  그룹핑에 참여한 필드 OR 집계 함수만 올 수 있다.
+
+--  Having
+--  평균 급여가 7000이상인 부서만
+
+select department_id, AVG(salary)
+from employees
+Where avg(salary) >= 7000   --  where 절은 Group by 집계가 일어나기 전에 조건 체크
+Group by department_id;
+
+--  집계 함수 실행 전에 Where 절의 조건을 검사
+--  집계 함수 컬럼은 WHere 절에서 사용할 수 없다
+--  집계 이후 조건 검사는 Having 절을 수행
+
+--  수정된 쿼리
+select department_id, Round(AVG(salary), 2)
+from employees
+Group by department_id
+Having AVG(salary) >= 7000
+order by department_id;
+
+------------
+--  분석 함수
+------------
+--  Roll up
+--  Group by 절과 함께 사용
+--  그룹핑된 결과에 좀 더 상세한 요약을 제공
+--  일종의 item total 기능을 수행
+select department_id, job_id, AVG(salary)
+from employees
+Group by department_id, job_id
+order by department_id, job_id;
+
+--  Roll UP 으로  ITEM TOTAL 출력
+select department_id, job_id, sum(salary)
+from employees
+group by ROLLUP(department_id, job_id)
+order by department_id;
+
+--  Cube
+--  Cross Tab에 의한 Summary 함께 추출
+--  Rollup 함수에 의해 제공되는 ITEM TOTAL과 함께
+--  COLUMN TOTAL 값을 함께 제공한다
+select department_id, job_id, sum(salary)
+from employees
+Group by cube(department_id, job_id)
+order by department_id;
+
+-------------------
+--  SUBQUERY
+-------------------
+--  하나의 SQL 내부에 다른 SQL을 포함하는 상태
+--  임시로 테이블 구성, 임시 결과를 바탕으로 최총 쿼리 수행
+
+--  사원들의 급여 중앙값보다 많은 급여을 받는 직원들의 목록
+--  급여의 중간 값?
+--  중앙값보다 많이 받는 직원 추출 쿼리
+
+--  급여의 중앙값은 얼마?
+select Median(salary) from employees;   --  6200
+
+--  이 결과보다 많은 급여를 받는 직원
+select first_name, salary
+from employees
+where salary > 6200
+order by salary desc;   -- 52
+
+--  두 쿼리를 합쳐보자
+select first_name, salary
+from employees
+where salary > (select Median(salary) from employees)
+order by salary desc;   --  52
+
+select first_name, hire_date from employees;    --107
+--  사원 중, SUSAN 보다 늦게 입사한 사원 출력해
+--  쿼리 1. 이름이 줄리아인 사원의 입사일을 출력
+select hire_date from employees
+where first_name = 'Susan'; --  02/06/07
+
+--  쿼리 2. 입사일이 특정 일자보다 나중인 사원 출력!
+select first_name, hire_date from employees
+where hire_date > '02/06/07';
+
+--  두 쿼리 합치기
+select first_name, hire_date
+from employees
+where hire_date > (select hire_date from employees where first_name = 'Susan');
+
+--  단일행 서브 쿼리
+--  서브 쿼리의 결과가 단일행인 경우
+--  단일행 연산자 : =, >, >=, <, <=, <>
+--  가장 적게 받는 사원의 이름과 사원 번호
+select first_name, salary, employee_id
+from employees
+where salary = (select MIN(salary) from employees);
+
+--  평균 급여보다 적게 받는 사원의 이름, 급여
+select first_name, salary
+from employees
+where salary < (select AVG(salary) from employees); --  56
+
+--  다중행 서브쿼리
+--  서브 쿼리의 결과 레코드가 둘 이상인 것 -> 단순 비교 연산자 수행 불가
+--  집합 연산에 관련된 IN, ANY, ALL, EXIST 사용
+
+--  서브 쿼리로 사용할 쿼리
+select salary from employees where department_id = 110;
+
+select first_name, salary
+from employees
+where salary in ( select salary from employees
+where department_id = 110);
+
+--  IN ( 12008, 8300) -> salary = 12008 OR salary = 8300
+
+select first_name, salary
+from employees
+where salary > ALL ( select salary from employees
+where department_id = 110);
+
+--  > ALL (12008, 8300) -> salary > 12008 AND salary > 8300
+
+select first_name, salary
+from employees
+where salary = ANY ( select salary from employees
+where department_id = 110);
+
+--  = ANY (12008, 8300) -> salary = 12008 AND salary = 8300
+
+--  Correlated Query (연관 쿼리)
+--  바깥쪽 쿼리 (주 쿼리)와 안쪽 쿼리( 서브 쿼리)가 서로 연관된 쿼리
+select first_name, salary, department_id
+from employees outer 
+where salary  > (select AVG(salary) from employees
+where department_id = outer.department_id);
+--  의미
+--  사원 목록을 뽑아 오는데 자신이 속한 부서의 평균 급여보다 많이 받는 직원을 뽑아오자
+
+--  서브 쿼리 연습
+--  각 부서별 최고 급여를 받는 사원의 목록 출력
+--  (조건절)
+--  쿼리 1. 각 부서의 최고 급여 테이블을 뽑자
+select department_id, max(salary) from employees
+group by department_id;
+
+--  쿼리 2. 위 쿼리에서 나온 부서 아이디, 최고 급여 값을 비교 
+select department_id, employee_id, first_name, salary
+from employees
+where (department_id, salary) IN 
+(select department_id, MAX(salary) from employees group by department_id);
+
+--  각 부서별로 최고 급여를 받은 사원의 목록 출력(테이블 조인)
+select emp.department_id, 
+    emp.employee_id,
+    emp.salary,
+    first_name
+from employees emp, (select department_id, max(salary)salary
+    from employees group by department_id) sal
+where emp.department_id = sal.department_id AND
+    emp.salary = sal.salary
+Order by emp.department_id;
+    --  Top-K Query
+    
+--  rownum : 쿼리 질의 수행결과에 의한 가상의 컬럼 -> 쿼리 결과 순서 반환
+
+
+--  2007   년 입사자중, 연봉 순위 5위까지 추출
+
+select rownum, first_name, salary
+from (select * from employees
+    where hire_date Like '07%'
+    order by salary desc)
+where rownum <= 5;
+
+-----------
+--  집합연산
+-----------
+
+select first_name, salary, hire_date
+from employees
+where hire_date < '05/01/01';   --  2005년 1월 1일 이전 24
+
+select first_name, salary, hire_date
+from employees
+where salary > 12000;   --  12000 초과 급여를 받는 사원 8
+
+--  두 쿼리를 합쳐보자 
+select first_name, salary, hire_date
+from employees
+where hire_date < '05/01/01'   --  2005년 1월 1일 이전 24
+Intersect 
+select first_name, salary, hire_date
+from employees
+where salary > 12000;   --  12000 초과 급여를 받는 사원 6
+
+--  입사일이 '05/01/01' 이전 이거나 12000 이거나
+select first_name, salary, hire_date
+from employees
+where hire_date < '05/01/01'   --  2005년 1월 1일 이전 
+UNION
+select first_name, salary, hire_date
+from employees
+where salary > 12000;   --  12000 초과 급여를 받는 사원 26
+
+--  UNION ALL
+select first_name, salary, hire_date
+from employees
+where hire_date < '05/01/01'   --  2005년 1월 1일 이전 
+UNION ALL
+select first_name, salary, hire_date
+from employees
+where salary > 12000;   --  12000 초과 급여를 받는 사원 32
+
+--  차집합
+select first_name, salary, hire_date
+from employees
+where hire_date < '05/01/01'   --  2005년 1월 1일 이전 
+MINUS
+select first_name, salary, hire_date
+from employees
+where salary > 12000;   --  12000 초과 급여를 받는 사원 18
+
+--  Rank 관련
+
+select first_name, salary,
+    rank() over(order by salary desc) as rank, --   중복 순위는 제외하고 출력
+    DENSE_RANK() over(order by salary desc) as "DENSE RANK",    -- 중복과 상관 없이 출력
+    ROW_number() over(order by salary desc) as "ROW NUMBER" --  처리 순서 출력
+from employees;
+
+------------
+--  계층형 쿼리
+
+--  Oracle
+--  질의 결과를 Tree형태로 출력
+--  현재 Employeee 테이블을 이용, 조직도를 출력해보자
+
+select employee_id, first_name, manager_id
+from employees;
+
+select level, employee_id, first_name, manager_id
+from employees
+start with manager_id is Null  --  Root Node의 조건
+Connect by prior  employee_id = manager_id
+order by level;
+
+--  JOIN을 이용해서 manager 이름 확인
+select level, emp.employee_id, emp.first_name || ' ' || emp.last_name,
+    emp.manager_id, man.employee_id, man.first_name || ' ' || man.last_name
+from employees emp LEFT OUTER JOIN employees man
+    on emp.manager_id = man.manager_id
+Start with emp.manager_id is Null
+connect by prior emp.employee_id = emp.manager_id
+order by level;
